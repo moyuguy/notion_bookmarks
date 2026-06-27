@@ -13,13 +13,13 @@ export const AirQualityBadge: React.FC<AirQualityBadgeProps> = ({ aqi, category,
   const styleClass = AIR_QUALITY_STYLES[category as AqiCategory] || '';
 
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`air-quality-badge flex items-center gap-1 ${className}`}>
       <div 
-        className={`px-1.5 py-0.5 rounded text-xs font-medium ${styleClass}`}
+        className={`air-quality-category px-1.5 py-0.5 rounded text-xs font-medium ${styleClass}`}
       >
         {category}
       </div>
-      <span className="font-medium">{aqi}</span>
+      <span className="air-quality-value font-medium">{aqi}</span>
     </div>
   );
 }; // Added missing semicolon

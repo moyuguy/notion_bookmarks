@@ -47,28 +47,33 @@ const Navigation = memo(function Navigation({ categories, config = defaultConfig
     })
   }, []);
 
-  // 处理导航点击
-  const handleNavClick = useCallback((categoryId: string, subCategoryId?: string) => {
-    setActiveCategory(categoryId);
-    
-    // 确保在客户端环境中执行DOM操作
+  const scrollToElement = useCallback((elementId: string) => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    
-    const elementId = subCategoryId ? `${categoryId}-${subCategoryId}` : categoryId;
+
     const element = document.getElementById(elementId);
-    
+
     if (element) {
-      // 获取元素的位置
       const rect = element.getBoundingClientRect();
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      // 滚动到元素位置，减去顶部导航栏的高度（根据实际高度调整）
+
       window.scrollTo({
         top: rect.top + scrollTop - 100,
         behavior: 'smooth'
       });
     }
   }, []);
+
+  // 处理导航点击
+  const handleNavClick = useCallback((categoryId: string, subCategoryId?: string) => {
+    const elementId = subCategoryId ? `${categoryId}-${subCategoryId}` : categoryId;
+    setActiveCategory(elementId);
+    scrollToElement(elementId);
+  }, [scrollToElement]);
+
+  const handleCategoryToggle = useCallback((categoryId: string) => {
+    toggleCategory(categoryId);
+    handleNavClick(categoryId);
+  }, [handleNavClick, toggleCategory]);
 
   // Set default active category on mount
   useEffect(() => {
@@ -91,24 +96,32 @@ const Navigation = memo(function Navigation({ categories, config = defaultConfig
         <div className="overflow-x-auto flex items-center h-12 border-t scrollbar-none">
           <div className="flex px-4 min-w-full">
             <div className="flex space-x-2 mx-auto">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handleNavClick(category.id)}
-                  className={cn(
-                    "whitespace-nowrap px-3 py-1.5 text-sm rounded-full transition-colors shrink-0",
-                    activeCategory === category.id
-                      ? theme === 'simple-dark' 
-                        ? "bg-primary text-primary-foreground font-medium"
-                        : "bg-primary text-white font-medium"
-                      : theme === 'simple-dark'
-                        ? "bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                  )}
-                >
-                  {category.name}
-                </button>
-              ))}
+              {categories.map((category) => {
+                const isMobileCategoryActive =
+                  activeCategory === category.id ||
+                  activeCategory.startsWith(`${category.id}-`);
+
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => handleNavClick(category.id)}
+                    className={cn(
+                      "mobile-nav-category-button whitespace-nowrap px-3 py-1.5 text-sm rounded-full transition-colors shrink-0",
+                      isMobileCategoryActive
+                        ? theme === 'bauhaus-primary'
+                          ? "mobile-nav-category-active font-medium"
+                          : theme === 'simple-dark'
+                          ? "mobile-nav-category-active bg-accent text-foreground font-medium"
+                          : "mobile-nav-category-active bg-primary text-white font-medium"
+                        : theme === 'simple-dark'
+                          ? "bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    )}
+                  >
+                    {category.name}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -128,16 +141,24 @@ const Navigation = memo(function Navigation({ categories, config = defaultConfig
             const IconComponent = category.iconName && (category.iconName in Icons)
               ? (Icons[category.iconName as keyof typeof Icons] as React.ComponentType)
               : Icons.Globe;
+            const isCategoryActive =
+              activeCategory === category.id ||
+              activeCategory.startsWith(`${category.id}-`);
+            const isCategoryExpanded = expandedCategories.has(category.id);
 
             return (
               <li key={category.id}>
                 <div className="flex flex-col">
                   <button
-                    onClick={() => toggleCategory(category.id)}
+                    onClick={() => handleCategoryToggle(category.id)}
                     className={cn(
-                      "w-full flex items-center justify-between px-4 py-2 rounded-lg transition-colors",
-                      expandedCategories.has(category.id)
-                        ? "bg-accent"
+                      "nav-category-button w-full flex items-center justify-between px-4 py-2 rounded-lg transition-colors",
+                      isCategoryActive
+                        ? theme === 'simple-dark'
+                          ? "nav-category-active bg-accent text-foreground font-medium"
+                          : "nav-category-active bg-primary text-white font-medium"
+                        : isCategoryExpanded
+                        ? "nav-category-expanded bg-accent"
                         : "hover:bg-accent/50"
                     )}
                   >
@@ -149,20 +170,22 @@ const Navigation = memo(function Navigation({ categories, config = defaultConfig
                     <Icons.ChevronDown
                       className={cn(
                         "w-4 h-4 transition-transform",
-                        expandedCategories.has(category.id) ? "rotate-180" : ""
+                      expandedCategories.has(category.id) ? "rotate-180" : ""
                       )}
                     />
                   </button>
-                  {expandedCategories.has(category.id) && (
+                  {isCategoryExpanded && (
                     <ul className="mt-1 ml-4 space-y-1">
                       {category.subCategories.map((subCategory) => (
                         <li key={subCategory.id}>
                           <button
                             onClick={() => handleNavClick(category.id, subCategory.id)}
                             className={cn(
-                              "w-full text-left px-4 py-2 rounded-lg transition-colors text-sm",
+                              "nav-subcategory-button w-full text-left px-4 py-2 rounded-lg transition-colors text-sm",
                               activeCategory === `${category.id}-${subCategory.id}`
-                                ? "bg-primary text-white font-medium"
+                                ? theme === 'simple-dark'
+                                  ? "nav-subcategory-active bg-accent text-foreground font-medium"
+                                  : "nav-subcategory-active bg-primary text-white font-medium"
                                 : "text-muted-foreground hover:text-foreground hover:bg-accent"
                             )}
                           >

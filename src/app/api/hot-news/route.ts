@@ -51,6 +51,20 @@ let cache: {
 } | null = null;
 
 const CACHE_TIME = 15 * 60 * 1000; // 15分钟
+const HOT_NEWS_DEBUG = process.env.HOT_NEWS_DEBUG === '1';
+
+function logHotNewsDebug(message: string, details?: unknown) {
+  if (!HOT_NEWS_DEBUG) {
+    return;
+  }
+
+  if (details === undefined) {
+    console.debug(message);
+    return;
+  }
+
+  console.debug(message, details);
+}
 
 // 获取微博热搜
 async function getWeiboHotNews(): Promise<HotNewsItem[]> {
@@ -70,7 +84,7 @@ async function getWeiboHotNews(): Promise<HotNewsItem[]> {
     
     // 检查数据结构是否存在
     if (!data || !data.data || !data.data.realtime) {
-      console.error('Weibo API response structure changed:', data);
+      logHotNewsDebug('Weibo API response structure changed:', data);
       throw new Error('Invalid response structure');
     }
     
@@ -83,7 +97,7 @@ async function getWeiboHotNews(): Promise<HotNewsItem[]> {
         platform: 'weibo'
       }));
   } catch (error) {
-    console.error('Failed to fetch Weibo hot news:', error);
+    logHotNewsDebug('Failed to fetch Weibo hot news:', error);
     
     // 尝试备用API
     try {
@@ -110,7 +124,7 @@ async function getWeiboHotNews(): Promise<HotNewsItem[]> {
           }));
       }
     } catch (backupError) {
-      console.error('Failed to fetch Weibo hot news from backup API:', backupError);
+      logHotNewsDebug('Failed to fetch Weibo hot news from backup API:', backupError);
     }
     
     return [];
@@ -147,7 +161,7 @@ async function getBaiduHotNews(): Promise<HotNewsItem[]> {
         platform: 'baidu'
       }));
   } catch (error) {
-    console.error('Failed to fetch Baidu hot news:', error);
+    logHotNewsDebug('Failed to fetch Baidu hot news:', error);
     // 如果上面都失败了，尝试直接抓取百度页面
     try {
       const response = await fetch('https://top.baidu.com/board?tab=realtime', {
@@ -173,7 +187,7 @@ async function getBaiduHotNews(): Promise<HotNewsItem[]> {
           };
         });
     } catch (backupError) {
-      console.error('Failed to fetch Baidu hot news from backup:', backupError);
+      logHotNewsDebug('Failed to fetch Baidu hot news from backup:', backupError);
       return [];
     }
   }
@@ -194,7 +208,7 @@ async function getBilibiliHotNews(): Promise<HotNewsItem[]> {
         platform: 'bilibili'
       }));
   } catch (error) {
-    console.error('Failed to fetch Bilibili hot news:', error);
+    logHotNewsDebug('Failed to fetch Bilibili hot news:', error);
     // 备用API
     try {
       const backupResponse = await fetch('https://api.vvhan.com/api/hotlist?type=bili');
@@ -209,7 +223,7 @@ async function getBilibiliHotNews(): Promise<HotNewsItem[]> {
           platform: 'bilibili'
         }));
     } catch (backupError) {
-      console.error('Failed to fetch Bilibili hot news from backup:', backupError);
+      logHotNewsDebug('Failed to fetch Bilibili hot news from backup:', backupError);
       return [];
     }
   }
@@ -230,7 +244,7 @@ async function getToutiaoHotNews(): Promise<HotNewsItem[]> {
         platform: 'toutiao'
       }));
   } catch (error) {
-    console.error('Failed to fetch Toutiao hot news:', error);
+    logHotNewsDebug('Failed to fetch Toutiao hot news:', error);
     return [];
   }
 }
@@ -253,7 +267,7 @@ async function getDouyinHotNews(): Promise<HotNewsItem[]> {
     }
     return [];
   } catch (error) {
-    console.error('Failed to fetch Douyin hot news:', error);
+    logHotNewsDebug('Failed to fetch Douyin hot news:', error);
     // 如果官方API失败，尝试备用API
     try {
       const backupResponse = await fetch('https://api.vvhan.com/api/hotlist?type=douyin');
@@ -268,7 +282,7 @@ async function getDouyinHotNews(): Promise<HotNewsItem[]> {
           platform: 'douyin'
         }));
     } catch (backupError) {
-      console.error('Failed to fetch Douyin hot news from backup:', backupError);
+      logHotNewsDebug('Failed to fetch Douyin hot news from backup:', backupError);
       return [];
     }
   }
@@ -314,7 +328,7 @@ async function getCachedHotNews() {
 
 export async function GET() {
   try {
-    console.error('Fetching hot news...');
+    logHotNewsDebug('Fetching hot news...');
     const hotNews = await getCachedHotNews();
     // console.error('Hot news data:', hotNews);
     return NextResponse.json(hotNews);

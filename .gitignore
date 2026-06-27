@@ -61,3 +61,7 @@ CLAUDE.md
 # OpenSpec project planning (internal use)
 openspec/
 
+# Local Codex planning and visual QA artifacts
+docs/
+outputs/
+design-qa.md

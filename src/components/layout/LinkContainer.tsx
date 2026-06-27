@@ -61,10 +61,10 @@ const LinkContainer = memo(function LinkContainer({
 
         return (
           <section key={category.id} id={category.id} className="space-y-8">
-            <div className="flex items-center space-x-3 pb-2 border-b">
+            <div className="section-heading flex items-center gap-3 pb-2 border-b">
               {category.iconName &&
               Icons[category.iconName as keyof typeof Icons] ? (
-                <div className="w-7 h-7 p-1 rounded-lg bg-primary/5 text-primary">
+                <div className="section-heading-icon w-7 h-7 p-1 rounded-lg bg-primary/5 text-primary">
                   {React.createElement(
                     Icons[
                       category.iconName as keyof typeof Icons
@@ -73,7 +73,7 @@ const LinkContainer = memo(function LinkContainer({
                   )}
                 </div>
               ) : null}
-              <h2 className="text-2xl font-bold tracking-tight">{category.name}</h2>
+              <h2 className="section-heading-title text-2xl font-bold tracking-tight">{category.name}</h2>
             </div>
 
             <div className="space-y-12">

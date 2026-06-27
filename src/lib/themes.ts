@@ -5,4 +5,5 @@ export {
   themes,
   defaultTheme,
   getAllThemes,
+  getThemeMode,
 } from '@/themes';

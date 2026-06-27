@@ -26,7 +26,7 @@ export const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
       suppressHydrationWarning
     >
       {/* Background Decor */}
-      <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-primary/20 to-transparent pointer-events-none transition-opacity group-hover:opacity-20"></div>
+      <div className="weather-background-decor absolute inset-0 opacity-10 bg-gradient-to-br from-primary/20 to-transparent pointer-events-none transition-opacity group-hover:opacity-20"></div>
       
       <div className="flex justify-between items-start relative z-10">
         <div>
@@ -37,10 +37,10 @@ export const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
               <button 
                 ref={buttonRef}
                 onClick={onToggleSelector}
-                className="text-xs p-1 rounded-full hover:bg-primary/10 focus:outline-none transition-colors"
+                className="weather-location-trigger text-xs p-1 rounded-full hover:bg-primary/10 focus:outline-none transition-colors"
                 title="更改位置"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="weather-location-icon text-primary">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
